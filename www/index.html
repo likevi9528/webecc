@@ -90,7 +90,7 @@
  
   &lt;&lt;===&gt;&gt;
   <div class="border content">
-    <div class="title">秘文Base64</div>
+    <div class="title">密文Base64</div>
     <div>
       <div class="row ">
         <form id = 'clearfileform'>
@@ -105,12 +105,14 @@
       <a id = 'downloadCipher' href="javascript:void(0)" > 下载加密文件 </a>
       <br>
       <br>
-      <a id="sendemail" href="javascript:void(0)">发送加密结果到邮件</a>
+      <a id="sendemail" href="javascript:void(0)">发送加密结果到邮件(复制加密数据)</a>
       <br>
-      <a id="sendemail2" href="javascript:void(0)">发送加密结果到邮件(手动粘贴加密数据)</a>
+      <a id="copyciphertext" href="javascript:void(0)">复制加密数据(包括附加信息)</a>
+      <br>
+      <a id="copycrypttext" href="javascript:void(0)">仅复制加密数据</a>
     
     </div>
-    <textarea id='ciphertext' class="bigTxtArea" type="text" autocomplete='off' placeholder="输入秘文或者选择加密后的文件(.ec)" ></textarea>
+    <textarea id='ciphertext' class="bigTxtArea" type="text" autocomplete='off' placeholder="输入密文或者选择加密后的文件(.ec)" ></textarea>
   </div>
 </div>
 

@@ -105,7 +105,7 @@
 
     let base64 = getCipherText();
     if (!base64) {
-      setErrMsg("请输入秘文base64 或选择文件");
+      setErrMsg("请输入密文base64 或选择文件");
       return;
     }
     try {
@@ -235,7 +235,8 @@
     let obj = document.getElementById("clearfileform") as HTMLFormElement;
     obj.reset();
   };
-  document.getElementById("sendemail2")!.onclick = async () => {
+
+  document.getElementById("copycrypttext")!.onclick = async () => {
     let cipher = getCipherText();
     if (!cipher) {
       let t = await encryptClick();
@@ -248,24 +249,84 @@
       }
     }
 
-    let msg = `
-   ${G_Input?.prefix || ""}
-   备份时间:${beijingtime()}
+    // 将消息文本复制到剪贴板
+    try {
+      await navigator.clipboard.writeText(cipher);
+      console.log('Cipher copied to clipboard');
+  } catch (err) {
+      console.error('Failed to copy: ', err);
+      // 复制失败时的处理
+      return;
+    }
+  };
 
-   公钥:${getPublicKey()}
 
-   网页地址:
-   ${location.href}
+  document.getElementById("copyciphertext")!.onclick = async () => {
+    let cipher = getCipherText();
+    if (!cipher) {
+      let t = await encryptClick();
+      if (!t) {
+        return;
+      }
+      cipher = getCipherText();
+      if (!cipher) {
+        return;
+      }
+    }
 
-   数据base64:
+  // let aprefix, atoEmail, aemailSubject
 
+  // if (G_Input?.prefix) {
+  //   aprefix = `prefix: ${G_Input.prefix}`
+  // } else {
+  //   aprefix = ""
+  // }
 
-   `;
-    let mailto = `mailto:${G_Input.toEmail}?subject=${encodeURIComponent(
-      G_Input.emailSubject || "备份"
-    )}&body=${encodeURIComponent(msg)}`;
-    console.log(mailto);
-    window.open(mailto, "target", "");
+  // if (G_Input?.toEmail) {
+  //   atoEmail = `toEmail: ${G_Input?.toEmail}`
+  // } else {
+  //   atoEmail = "toEmail: null"
+  // }
+
+  // if (G_Input?.emailSubject) {
+  //   aemailSubject = `emailSubject: ${G_Input?.emailSubject}`
+  // } else {
+  //   aemailSubject = ""
+  // }
+  // ${aprefix}
+  // ${atoEmail}
+  // ${aemailSubject}
+
+  let msg = `
+${"prefix: " + G_Input?.prefix || ""}
+${"toEmail: " + G_Input?.toEmail || ""}
+${"emailSubject: " + G_Input?.emailSubject || ""}
+------------------------------
+备份时间: ${beijingtime()}
+  
+公钥: ${getPublicKey()}
+  
+网页地址: ${location.href}
+  
+密文base64: ${cipher}
+  
+  `;
+
+    // let mailto = `mailto:${G_Input.toEmail}?subject=${encodeURIComponent(
+    //   G_Input.emailSubject || "备份"
+    // )}&body=${encodeURIComponent(msg)}`;
+
+    // 将消息文本复制到剪贴板
+    try {
+      await navigator.clipboard.writeText(msg);
+      console.log('Ciphers copied to clipboard');
+  } catch (err) {
+      console.error('Failed to copy: ', err);
+      // 复制失败时的处理
+      return;
+  }
+    // console.log(mailto);
+    // window.open(mailto, "target", "");
   };
   document.getElementById("sendemail")!.onclick = async () => {
     let cipher = getCipherText();
@@ -280,25 +341,37 @@
       }
     }
 
+
     let msg = `
-   ${G_Input?.prefix || ""}
-   备份时间:${beijingtime()}
+${"prefix: " + G_Input?.prefix || ""}
+${"toEmail: " + G_Input?.toEmail || ""}
+${"emailSubject: " + G_Input?.emailSubject || ""}
+------------------------------
+备份时间: ${beijingtime()}
 
-   公钥:${getPublicKey()}
+公钥: ${getPublicKey()}
 
-   网页地址:
-   ${location.href}
+网页地址: ${location.href}
 
+密文base64: ${cipher}
 
-   数据base64:
+`;
 
-   ${cipher}
+   // 将消息文本复制到剪贴板
+  try {
+      await navigator.clipboard.writeText(msg);
+      console.log('Ciphers copied to clipboard');
+  } catch (err) {
+      console.error('Failed to copy: ', err);
+      // 复制失败时的处理
+      return;
+  }
 
-
-
-   `;
-    let mailto = `mailto:${G_Input.toEmail}?subject=${encodeURIComponent(
-      G_Input.emailSubject || "备份"
+  if (G_Input?.toEmail === null || G_Input?.toEmail === undefined) {
+    alert("未设置toEmail，跳转失败。已复制请手动粘贴到邮箱。");
+  }
+  let mailto = `mailto:${G_Input.toEmail}?subject=${encodeURIComponent(
+     G_Input.emailSubject || "备份"
     )}&body=${encodeURIComponent(msg)}`;
     console.log(mailto);
     window.open(mailto, "target", "");
