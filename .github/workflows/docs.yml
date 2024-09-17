@@ -1,0 +1,54 @@
+name: gen docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: "16"
+        cache: ${{ steps.detect-package-manager.outputs.manager }}
+    - run: npm ci
+    - run: npm run build --if-present
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: ./www
+
+    - name: Upload Artifact
+      id: upload
+      shell: bash
+      run: |
+        echo "RELEASE_NAME=Released on $(TZ=Asia/Shanghai date +%Y%m%d%H%M)" >> $GITHUB_ENV
+        echo "TAG_NAME=$(TZ=Asia/Shanghai date +%Y%m%d%H%M)" >> $GITHUB_ENV
+        cp www/ docs/ -rf
+        tar -zcvf docs.tar.gz docs
+
+    - name: Release and upload assets
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        release_name: ${{ env.RELEASE_NAME }}
+        tag: ${{ env.TAG_NAME }}
+        file_glob: true
+        file: docs.tar.gz
+
+    - name: push rep
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add docs
+        git commit -m "${{ env.RELEASE_NAME }}"
+        git remote set-url origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+        git push -f -u origin master
